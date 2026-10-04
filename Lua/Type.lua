@@ -1,0 +1,4 @@
+---@class integer : number
+---@class real :number
+---@class code : function
+---@class unit : number

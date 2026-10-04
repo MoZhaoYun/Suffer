@@ -1,0 +1,28 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "保存",
+            "type": "shell",
+            "command": "${workspaceFolder}\\Task\\Save.bat",
+            "args": [
+                "${workspaceFolder}"
+            ]
+        },
+        {
+            "label": "测试",
+            "type": "shell",
+            "command": "${workspaceFolder}\\Task\\Test.bat",
+            "args": [
+                "${workspaceFolder}"
+            ]
+        },
+        {
+            "label": "保存并测试",
+            "dependsOn": ["保存", "测试"],
+            "dependsOrder": "sequence"
+        }
+    ]
+}

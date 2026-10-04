@@ -1,0 +1,12 @@
+# 忽略文件类型
+*.mdl
+*.mdx
+*.blp
+*.tga
+*.ttf
+
+# 忽略文件夹
+
+# 忽略文件
+Suffer.w3x
+used_ids.txt
