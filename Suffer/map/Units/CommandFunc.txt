@@ -1,0 +1,102 @@
+// 巡逻
+[CmdPatrol]
+Art=CommandPatrol
+Buttonpos=0,0
+
+// 移动
+[CmdMove]
+Art=CommandMove
+Buttonpos=1,0
+
+// 停止
+[CmdStop]
+Art=CommandStop
+Buttonpos=2,0
+
+// 保持原位
+[CmdHoldPos]
+Art=CommandHoldPosition
+Buttonpos=3,0
+
+// 攻击
+[CmdAttack]
+Art=CommandAttack
+Buttonpos=4,0
+
+// 攻击地面
+[CmdAttackGround]
+Art=CommandAttackGround
+Buttonpos=4,1
+
+// 集结
+[CmdRally]
+Art=CommandRally
+Buttonpos=4,1
+PlacementModel=UI\Feedback\RallyPoint\RallyPoint.mdl
+
+// 选择技能
+[CmdSelectSkill]
+Art=CommandNewSkill
+Buttonpos=4,1
+
+// 采购
+[CmdPurchase]
+Art=CommandPurchase
+Buttonpos=0,0
+
+// 建造
+[CmdBuild]
+Art=CommandBasicStruct
+Buttonpos=0,3
+
+// 建造-人族
+[CmdBuildHuman]
+Art=CommandBasicStructHuman
+Buttonpos=0,3
+
+// 建造-兽族
+[CmdBuildOrc]
+Art=CommandBasicStructOrc
+Buttonpos=0,3
+
+// 建造-暗夜精灵
+[CmdBuildNightElf]
+Art=CommandBasicStructNightElf
+Buttonpos=0,3
+
+// 建造-不死族
+[CmdBuildUndead]
+Art=CommandBasicStructUndead
+Buttonpos=0,3
+
+// 取消
+[CmdCancel]
+Art=CommandCancel
+ButtonPos=4,3
+
+// 取消建造
+[CmdCancelBuild]
+Art=CommandCancel
+ButtonPos=4,3
+
+// 取消训练
+[CmdCancelTrain]
+Art=CommandCancel
+ButtonPos=4,3
+
+// 取消复活
+[CmdCancelRevive]
+Art=CommandCancel
+ButtonPos=4,3
+
+//[CmdUnivStr]
+//Art=
+//Buttonpos=0,0
+
+//[CmdUnivInt]
+//Art=
+//Buttonpos=1,0
+
+//[CmdUnivAgi]
+//Art=
+//Buttonpos=2,0

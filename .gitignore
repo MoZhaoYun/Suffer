@@ -4,6 +4,9 @@
 *.blp
 *.tga
 *.ttf
+*.xlsx
+*.xlsm
+*.docx
 
 # 忽略文件夹
 
