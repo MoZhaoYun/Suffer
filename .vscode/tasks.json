@@ -4,24 +4,36 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "保存",
-            "type": "shell",
+            "label": "保存[OBJ]",
             "command": "${workspaceFolder}\\Task\\Save.bat",
             "args": [
-                "${workspaceFolder}"
+                "${workspaceFolder}",
+                "OBJ"
+            ]
+        },
+        {
+            "label": "保存[SLK]",
+            "command": "${workspaceFolder}\\Task\\Save.bat",
+            "args": [
+                "${workspaceFolder}",
+                "SLK"
             ]
         },
         {
             "label": "测试",
-            "type": "shell",
             "command": "${workspaceFolder}\\Task\\Test.bat",
             "args": [
                 "${workspaceFolder}"
             ]
         },
         {
-            "label": "保存并测试",
-            "dependsOn": ["保存", "测试"],
+            "label": "保存并测试[OBJ]",
+            "dependsOn": ["保存[OBJ]", "测试"],
+            "dependsOrder": "sequence"
+        },
+        {
+            "label": "保存并测试[SLK]",
+            "dependsOn": ["保存[SLK]", "测试"],
             "dependsOrder": "sequence"
         }
     ]

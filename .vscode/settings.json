@@ -1,5 +1,10 @@
 {
     "Lua.workspace.library": [
-        "${3rd}/Jass/library"
+        "${3rd}/Jass/library",
+        "${workspaceFolder}/Lua"
+    ],
+    "Lua.diagnostics.disable": [
+        "lowercase-global",
+        "redefined-local"
     ],
 }

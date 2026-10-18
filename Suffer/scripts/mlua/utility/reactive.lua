@@ -1,99 +1,111 @@
+local table_insert_unique = table.insert_unique
 local setmetatable = setmetatable
+local getmetatable = getmetatable
+local type = type
 
 -- 响应式
 local reactive = {}
-local mt = {}
-setmetatable(reactive, mt)
 
-local raw_proxy = {} -- raw -> proxy
-local proxy_raw = {} -- proxy -> raw
+local raw_to_proxy = setmetatable({}, { __mode = 'k' }) -- 原始表 -> 代理表
+local proxy_to_raw = setmetatable({}, { __mode = 'k' }) -- 代理表 -> 原始表
+local target_map = setmetatable({}, { __mode = 'k' })   -- 原始表 -> { [key] = [effect] }
+local active_effect = nil                               -- 当前正在执行的 effect
 
-local current_effect = nil
-local deps = {} -- deps[raw][key] = {effect1, effect2, ...}
-
--- 响应
----@param fn function 响应函数
----@return function 包装后的响应函数
-function reactive.effect(fn)
-    local wrapper
-    wrapper= function()
-        local pre = current_effect
-        current_effect = wrapper
-        fn()
-        current_effect = pre
-    end
-    wrapper()
-    return wrapper
-end
-
----追踪
+---跟踪依赖关系
 ---@param raw table 原始表
----@param key any 键值
+---@param key any 键名
 local function track(raw, key)
-    if not current_effect then return end
+    if not active_effect then return end
 
-    if not deps[raw] then deps[raw] = {} end
-    if not deps[raw][key] then deps[raw][key] = {} end
+    local deps = target_map[raw]
+    if not deps then
+        deps = {}
+        target_map[raw] = deps
+    end
 
-    table.insert_unique(deps[raw][key], current_effect)
+    local key_deps = deps[key]
+    if not key_deps then
+        key_deps = {}
+        deps[key] = key_deps
+    end
+
+    table_insert_unique(key_deps, active_effect)
 end
 
----触发
+---触发依赖关系
 ---@param raw table 原始表
----@param key any 键值
+---@param key any 键名
 local function trigger(raw, key)
-    local list = deps[raw] and deps[raw][key]
+    local deps = target_map[raw]
+    if not deps then return end
 
-    if not list then return end
+    local key_deps = deps[key]
+    if not key_deps then return end
 
-    for _, fn in ipairs(list) do
-        fn()
+    -- 先拷贝一份，防止执行过程中依赖表被修改
+    local effects = {}
+    for _, e in ipairs(key_deps) do
+        effects[#effects + 1] = e
+    end
+
+    for i = 1, #effects do
+        effects[i]()
     end
 end
 
----响应式代理
----@param _ table 响应式模块
----@param tbl table 需要响应式代理的表
----@return table 代理表
-function mt.__call(_, tbl)
-    -- 不是表，直接返回
-    if type(tbl) ~= "table" then return tbl end
-    -- 是代理表，直接返回
-    if proxy_raw[tbl] then return tbl end
-    -- 已经代理过的表，直接返回代理表
-    if raw_proxy[tbl] then return raw_proxy[tbl] end
+---创建effect
+---@param fn function 要执行的函数
+---@return function effect 函数
+function reactive.effect(fn)
+    local e
 
-    local proxy = {}
-    local proxy_mt = {
-        __index = function(self, key)
-            local raw = proxy_raw[self]
-            local value = raw[key]
+    e = function()
+        local prev = active_effect
+        active_effect = e
 
-            track(raw, key)
+        fn()
 
-            if type(value) == "table" then
-                return reactive(value)
-            end
+        active_effect = prev
+    end
 
-            return value
-        end,
-        __newindex = function(self, key, value)
-            local raw = proxy_raw[self]
-            local old = raw[key]
+    e()
 
-            if old == value then return end
-
-            raw[key] = value
-            trigger(raw, key)
-        end
-    }
-
-    raw_proxy[tbl] = proxy
-    proxy_raw[proxy] = tbl
-
-    return setmetatable(proxy, proxy_mt)
+    return e
 end
 
-MJass.log.info '响应式模块加载完毕'
+return setmetatable(reactive, {
+    ---代理表
+    ---@param obj table 要代理的表
+    __call = function(_, obj)
+        if type(obj) ~= "table" then return obj end            -- 非表类型，原样返回
+        if getmetatable(obj) then return obj end               -- 已有元表，原样返回
+        if proxy_to_raw[obj] then return obj end               -- 是代理表，原样返回
+        if raw_to_proxy[obj] then return raw_to_proxy[obj] end -- 已代理表，返回代理表
 
-return reactive
+        local proxy = setmetatable({}, {
+            __index = function(_, key)
+                track(obj, key)
+
+                local value = obj[key]
+                if type(value) == "table" then
+                    return reactive(value)
+                end
+
+                return value
+            end,
+            __newindex = function(_, key, value)
+                local old = obj[key]
+
+                if old ~= value then
+                    obj[key] = value
+                    trigger(obj, key)
+                end
+            end,
+        })
+
+        raw_to_proxy[obj] = proxy
+        proxy_to_raw[proxy] = obj
+
+        return proxy
+    end
+})
